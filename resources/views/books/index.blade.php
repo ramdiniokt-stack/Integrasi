@@ -2,21 +2,25 @@
 @section('title', 'Daftar Buku')
 
 @section('content')
-    @if (session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
-
     <p><a href="{{ route('books.create') }}">+ Tambah Buku</a></p>
 
     <table>
         <tr>
-            <th>No</th><th>Judul</th><th>Penulis</th><th>Tahun</th><th>Stok</th><th>Aksi</th>
+            <th>No</th>
+            <th>Judul</th>
+            <th>Penulis</th>
+            <th>Kategori</th>
+            <th>Tahun</th>
+            <th>Stok</th>
+            <th>Aksi</th>
         </tr>
+
         @forelse ($books as $book)
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $book->title }}</td>
                 <td>{{ $book->author }}</td>
+                <td>{{ $book->category?->name ?? 'Belum ada kategori' }}</td>
                 <td>{{ $book->year }}</td>
                 <td>{{ $book->stock }}</td>
                 <td>
@@ -33,7 +37,7 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="6">Belum ada data buku.</td></tr>
+            <tr><td colspan="7">Belum ada data buku.</td></tr>
         @endforelse
     </table>
 @endsection

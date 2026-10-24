@@ -24,6 +24,25 @@
         </div>
 
         <div>
+            <label for="category_id">Kategori</label>
+            <select name="category_id" id="category_id">
+                <option value="">Pilih kategori</option>
+
+                @foreach ($categories as $category)
+                    <option
+                        value="{{ $category->id }}"
+                        @selected(old('category_id') == $category->id)
+                    >
+                        {{ $category->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('category_id')
+                <p class="error">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
             <label for="year">Tahun Terbit</label>
             <input type="text" id="year" name="year" value="{{ old('year') }}">
             @error('year')
