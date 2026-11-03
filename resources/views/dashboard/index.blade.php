@@ -1,12 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>{{ $judulAplikasi }}</h2>
-    <p>{{ $deskripsiAplikasi }}</p>
+    <h2>Dashboard</h2>
+
+    <p>Selamat datang, <strong>{{ Auth::user()->name }}</strong>.</p>
+    <p>Anda login sebagai {{ Auth::user()->email }}.</p>
 
     <ul>
-        <li>Jumlah Buku: {{ $jumlahBuku }}</li>
-        <li>Jumlah Member: {{ $jumlahMember }}</li>
-        <li>Jumlah Kategori: {{ $jumlahKategori }}</li>
+        <li>Total buku: {{ $totalBooks }}</li>
+        <li>Total kategori: {{ $totalCategories }}</li>
     </ul>
+
+    <p><a href="{{ route('books.index') }}">Lihat daftar buku</a></p>
 @endsection

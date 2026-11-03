@@ -3,25 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Perpustakaan')</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 16px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #f3f3f3; }
-        label { display: block; margin-top: 12px; }
-        input, select { padding: 6px; width: 100%; max-width: 360px; }
-        .success { background: #d4edda; padding: 10px; margin-bottom: 16px; }
-        .error { color: #c00; font-size: 14px; margin: 4px 0 0; }
-    </style>
+    <title>Library System</title>
 </head>
 <body>
-    <h1>Perpustakaan</h1>
+    <h1>Library System</h1>
+
+    <nav>
+        <a href="{{ route('dashboard') }}">Dashboard</a> |
+        <a href="{{ route('books.index') }}">Books</a> |
+        <a href="{{ route('categories.index') }}">Categories</a> |
+        <a href="{{ route('members.index') }}">Members</a>
+
+        @auth
+            | Halo, {{ Auth::user()->name }}
+
+            {{-- Ketentuan 6: tombol logout --}}
+            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                @csrf
+                <button type="submit">Logout</button>
+            </form>
+        @endauth
+    </nav>
 
     @if (session('success'))
-        <div class="success">{{ session('success') }}</div>
+        <p>{{ session('success') }}</p>
     @endif
 
     @yield('content')
+
+    <footer>
+        <p>&copy; {{ date('Y') }} Library System</p>
+    </footer>
 </body>
 </html>
