@@ -11,9 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // alias middleware anti-cache
+        // alias middleware
         $middleware->alias([
             'nocache' => \App\Http\Middleware\PreventBackHistory::class,
+            'role'    => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
         // tamu yang membuka halaman terlindungi dikirim ke form login

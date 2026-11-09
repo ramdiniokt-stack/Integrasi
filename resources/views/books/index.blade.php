@@ -1,43 +1,58 @@
 @extends('layouts.app')
-@section('title', 'Daftar Buku')
 
 @section('content')
-    <p><a href="{{ route('books.create') }}">+ Tambah Buku</a></p>
+    @can('create', App\Models\Book::class)
+        <p><a href="{{ route('books.create') }}">+ Tambah Buku</a></p>
+    @endcan
 
     <table>
-        <tr>
-            <th>No</th>
-            <th>Judul</th>
-            <th>Penulis</th>
-            <th>Kategori</th>
-            <th>Tahun</th>
-            <th>Stok</th>
-            <th>Aksi</th>
-        </tr>
-
-        @forelse ($books as $book)
+        <thead>
             <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $book->title }}</td>
-                <td>{{ $book->author }}</td>
-                <td>{{ $book->category?->name ?? 'Belum ada kategori' }}</td>
-                <td>{{ $book->year }}</td>
-                <td>{{ $book->stock }}</td>
-                <td>
-                    <a href="{{ route('books.show', $book) }}">Detail</a>
-                    <a href="{{ route('books.edit', $book) }}">Edit</a>
-
-                    <form action="{{ route('books.destroy', $book) }}" method="POST"
-                          style="display:inline"
-                          onsubmit="return confirm('Yakin hapus?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit">Hapus</button>
-                    </form>
-                </td>
+                <th>No</th>
+                <th>Judul</th>
+                <th>Penulis</th>
+                <th>Tahun</th>
+                <th>Stok</th>
+                <th colspan="3">Aksi</th>
             </tr>
-        @empty
-            <tr><td colspan="7">Belum ada data buku.</td></tr>
-        @endforelse
+        </thead>
+        <tbody>
+            @forelse ($books as $book)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $book->title }}</td>
+                    <td>{{ $book->author }}</td>
+                    <td>{{ $book->year }}</td>
+                    <td>{{ $book->stock }}</td>
+
+                    <td>
+                        @can('view', $book)
+                            <a href="{{ route('books.show', $book) }}">Detail</a>
+                        @endcan
+                    </td>
+
+                    <td>
+                        @can('update', $book)
+                            <a href="{{ route('books.edit', $book) }}">Edit</a>
+                        @endcan
+                    </td>
+
+                    <td>
+                        @can('delete', $book)
+                            <form action="{{ route('books.destroy', $book) }}" method="POST"
+                                  onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit">Hapus</button>
+                            </form>
+                        @endcan
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8">Belum ada data buku.</td>
+                </tr>
+            @endforelse
+        </tbody>
     </table>
 @endsection

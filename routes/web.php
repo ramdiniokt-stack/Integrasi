@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Halaman awal: arahkan ke daftar buku (jika belum login, auth akan mengirim ke /login)
 Route::get('/', function () {
     return redirect()->route('books.index');
 });
@@ -18,21 +21,21 @@ Route::middleware('guest')->group(function () {
         ->name('login.submit');
 });
 
-// Logout hanya untuk yang sudah login, dan harus lewat POST
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// Semua halaman di bawah ini dilindungi: wajib login
+// Admin dan petugas: wajib login
 Route::middleware(['auth', 'nocache'])->group(function () {
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     Route::resource('books', BookController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('members', MemberController::class);
+});
 
-    // Halaman sederhana. Ganti dengan controller Anda jika sudah dibuat.
-    Route::view('/categories', 'pages.simple', ['title' => 'Categories'])
-        ->name('categories.index');
-
-    Route::view('/members', 'pages.simple', ['title' => 'Members'])
-        ->name('members.index');
+// Hanya admin: wajib login DAN lolos Gate manage-users
+Route::middleware(['auth', 'nocache', 'can:manage-users'])->group(function () {
+    Route::resource('users', UserController::class)->except('show');
 });

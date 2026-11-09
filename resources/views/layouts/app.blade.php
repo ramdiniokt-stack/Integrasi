@@ -14,10 +14,14 @@
         <a href="{{ route('categories.index') }}">Categories</a> |
         <a href="{{ route('members.index') }}">Members</a>
 
-        @auth
-            | Halo, {{ Auth::user()->name }}
+        {{-- Menu hanya untuk admin (Gate manage-users) --}}
+        @can('manage-users')
+            | <a href="{{ route('users.index') }}">Kelola Pengguna</a>
+        @endcan
 
-            {{-- Ketentuan 6: tombol logout --}}
+        @auth
+            | Halo, {{ Auth::user()->name }} ({{ Auth::user()->role }})
+
             <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                 @csrf
                 <button type="submit">Logout</button>

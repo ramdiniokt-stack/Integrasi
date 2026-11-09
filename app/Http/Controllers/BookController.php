@@ -4,32 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class BookController extends Controller
 {
-    /**
-     * Daftar buku.
-     */
     public function index()
     {
+        Gate::authorize('viewAny', Book::class);
+
         $books = Book::orderBy('id')->get();
 
         return view('books.index', compact('books'));
     }
 
-    /**
-     * Form tambah buku.
-     */
     public function create()
     {
+        Gate::authorize('create', Book::class);
+
         return view('books.create');
     }
 
-    /**
-     * Simpan buku baru.
-     */
     public function store(Request $request)
     {
+        Gate::authorize('create', Book::class);
+
         $data = $this->validateBook($request);
 
         Book::create($data);
@@ -39,27 +37,24 @@ class BookController extends Controller
             ->with('success', 'Data buku berhasil ditambahkan.');
     }
 
-    /**
-     * Detail satu buku.
-     */
     public function show(Book $book)
     {
+        Gate::authorize('view', $book);
+
         return view('books.show', compact('book'));
     }
 
-    /**
-     * Form ubah buku.
-     */
     public function edit(Book $book)
     {
+        Gate::authorize('update', $book);
+
         return view('books.edit', compact('book'));
     }
 
-    /**
-     * Simpan perubahan buku.
-     */
     public function update(Request $request, Book $book)
     {
+        Gate::authorize('update', $book);
+
         $data = $this->validateBook($request);
 
         $book->update($data);
@@ -69,11 +64,10 @@ class BookController extends Controller
             ->with('success', 'Data buku berhasil diperbarui.');
     }
 
-    /**
-     * Hapus buku.
-     */
     public function destroy(Book $book)
     {
+        Gate::authorize('delete', $book);
+
         $book->delete();
 
         return redirect()
@@ -81,9 +75,6 @@ class BookController extends Controller
             ->with('success', 'Data buku berhasil dihapus.');
     }
 
-    /**
-     * Aturan validasi yang dipakai store dan update.
-     */
     private function validateBook(Request $request): array
     {
         return $request->validate([
