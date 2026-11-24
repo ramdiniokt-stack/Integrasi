@@ -12,7 +12,8 @@
         <a href="{{ route('dashboard') }}">Dashboard</a> |
         <a href="{{ route('books.index') }}">Books</a> |
         <a href="{{ route('categories.index') }}">Categories</a> |
-        <a href="{{ route('members.index') }}">Members</a>
+        <a href="{{ route('members.index') }}">Members</a> |
+        <a href="{{ route('borrowings.index') }}">Peminjaman</a>
 
         {{-- Menu hanya untuk admin (Gate manage-users) --}}
         @can('manage-users')
@@ -31,6 +32,10 @@
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
+    @endif
+
+    @if (session('error'))
+        <p style="color: red;">{{ session('error') }}</p>
     @endif
 
     @yield('content')

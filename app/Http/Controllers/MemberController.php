@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
+
 class MemberController extends Controller
 {
+    /**
+     * Daftar anggota dari tabel members.
+     */
     public function index()
     {
-        $members = [
-            ['nama' => 'Rara', 'status' => 'aktif'],
-            ['nama' => 'Riri', 'status' => 'aktif'],
-            ['nama' => 'Roro', 'status' => 'tidak aktif'],
-            ['nama' => 'Ruru', 'status' => 'aktif'],
-            ['nama' => 'Rere', 'status' => 'aktif'],
-        ];
+        $members = Member::orderBy('name')->get();
 
         return view('members.index', compact('members'));
     }

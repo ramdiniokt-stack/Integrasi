@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -12,7 +13,7 @@ class BookController extends Controller
     {
         Gate::authorize('viewAny', Book::class);
 
-        $books = Book::orderBy('id')->get();
+        $books = Book::with('category')->orderBy('id')->get();
 
         return view('books.index', compact('books'));
     }
@@ -21,7 +22,9 @@ class BookController extends Controller
     {
         Gate::authorize('create', Book::class);
 
-        return view('books.create');
+        $categories = Category::orderBy('name')->get();
+
+        return view('books.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -41,6 +44,8 @@ class BookController extends Controller
     {
         Gate::authorize('view', $book);
 
+        $book->load('category');
+
         return view('books.show', compact('book'));
     }
 
@@ -48,7 +53,9 @@ class BookController extends Controller
     {
         Gate::authorize('update', $book);
 
-        return view('books.edit', compact('book'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('books.edit', compact('book', 'categories'));
     }
 
     public function update(Request $request, Book $book)
@@ -68,6 +75,13 @@ class BookController extends Controller
     {
         Gate::authorize('delete', $book);
 
+        // buku yang sudah pernah dipinjam tidak boleh dihapus
+        if ($book->borrowingDetails()->exists()) {
+            return redirect()
+                ->route('books.index')
+                ->with('error', 'Buku tidak dapat dihapus karena sudah memiliki riwayat peminjaman.');
+        }
+
         $book->delete();
 
         return redirect()
@@ -78,20 +92,22 @@ class BookController extends Controller
     private function validateBook(Request $request): array
     {
         return $request->validate([
-            'title'  => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'year'   => 'required|integer|min:1000|max:' . date('Y'),
-            'stock'  => 'required|integer|min:0',
+            'title'       => 'required|string|max:255',
+            'author'      => 'required|string|max:255',
+            'year'        => 'required|integer|min:1000|max:' . date('Y'),
+            'stock'       => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
         ], [
-            'title.required'  => 'Judul wajib diisi.',
-            'author.required' => 'Penulis wajib diisi.',
-            'year.required'   => 'Tahun wajib diisi.',
-            'year.integer'    => 'Tahun harus berupa angka.',
-            'year.min'        => 'Tahun tidak valid.',
-            'year.max'        => 'Tahun tidak boleh melebihi tahun ini.',
-            'stock.required'  => 'Stok wajib diisi.',
-            'stock.integer'   => 'Stok harus berupa angka.',
-            'stock.min'       => 'Stok tidak boleh negatif.',
+            'title.required'     => 'Judul wajib diisi.',
+            'author.required'    => 'Penulis wajib diisi.',
+            'year.required'      => 'Tahun wajib diisi.',
+            'year.integer'       => 'Tahun harus berupa angka.',
+            'year.min'           => 'Tahun tidak valid.',
+            'year.max'           => 'Tahun tidak boleh melebihi tahun ini.',
+            'stock.required'     => 'Stok wajib diisi.',
+            'stock.integer'      => 'Stok harus berupa angka.',
+            'stock.min'          => 'Stok tidak boleh negatif.',
+            'category_id.exists' => 'Kategori tidak ditemukan.',
         ]);
     }
 }
